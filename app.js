@@ -9,7 +9,7 @@ var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENTID,
   clientSecret: process.env.CLIENTSECRET,
-  redirectUri: 'http://localhost:3000/code',
+  redirectUri: 'https://spotify-api-pnodseth-dev.herokuapp.com/code',
   accessToken: "BQD042QTtxxdsLMigvJJYXdoyU-hH-uNp26MEZPqF9W5B3y6fHZGFrF8yHAWrgCvSLHxfSVQwELHYKSXtAw5d_1S0VizPReCBXBVji15f0WC_PluAGQIi2mZRLte-oEWT0mhpZiRWr_jgOVooFlw7ICFVPfrC8kuhend",
   refreshToken: "AQBMwq90SXJJAsNfxGDavgvGAMdVyChhkH8HvvA2mVX2I5HmU_tkUnV7mrOPaWejlPTfA17OegpNbb80TZqRkGxp2b8WQTcX5ghJzALKq89KyewciCDG-SE60sp0Nu25MWs"
 });
@@ -67,4 +67,4 @@ app.get("/", function(req,res) {
 })
   
 
-  app.listen(PORT, () => console.log(`Example app listening at http://localhost:${PORT}`))
+  app.listen(PORT, () => console.log(`Example app listening at port ${PORT}`))
