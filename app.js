@@ -1,17 +1,19 @@
 const express = require('express')
 const dotenv = require("dotenv")
+const SpotifyWebApi = require('spotify-web-api-node');
 
 const app = express()
 const PORT = process.env.PORT || 3000;
 dotenv.config();
 
-var SpotifyWebApi = require('spotify-web-api-node');
-var spotifyApi = new SpotifyWebApi({
+let refreshInterval = null;
+const redirectUri = process.env.NODE_ENV === "dev" ? "http://localhost:3000/code" : 'https://spotify-api-pnodseth-dev.herokuapp.com/code'
+
+
+const spotifyApi = new SpotifyWebApi({
   clientId: process.env.CLIENTID,
   clientSecret: process.env.CLIENTSECRET,
-  redirectUri: 'https://spotify-api-pnodseth-dev.herokuapp.com/code',
-  accessToken: "BQD042QTtxxdsLMigvJJYXdoyU-hH-uNp26MEZPqF9W5B3y6fHZGFrF8yHAWrgCvSLHxfSVQwELHYKSXtAw5d_1S0VizPReCBXBVji15f0WC_PluAGQIi2mZRLte-oEWT0mhpZiRWr_jgOVooFlw7ICFVPfrC8kuhend",
-  refreshToken: "AQBMwq90SXJJAsNfxGDavgvGAMdVyChhkH8HvvA2mVX2I5HmU_tkUnV7mrOPaWejlPTfA17OegpNbb80TZqRkGxp2b8WQTcX5ghJzALKq89KyewciCDG-SE60sp0Nu25MWs"
+  redirectUri
 });
 var scopes = ['user-read-private', 'user-read-email', 'user-top-read']
 
@@ -32,6 +34,23 @@ app.get("/code", (req,res) => {
       // Set the access token on the API object to use it in later calls
       spotifyApi.setAccessToken(data.body['access_token']);
       spotifyApi.setRefreshToken(data.body['refresh_token']);
+
+      if (refreshInterval !== null) {
+        clearInterval(refreshInterval)
+      }
+      refreshInterval = setInterval(() => {
+        spotifyApi.refreshAccessToken().then(
+          function(data) {
+            console.log('The access token has been refreshed!');
+
+            // Save the access token so that it's used in future calls
+            spotifyApi.setAccessToken(data.body['access_token']);
+          },
+          function(err) {
+            console.log('Could not refresh access token', err);
+          }
+        );
+      }, 1000 * 60 * 30) // every 30 minutes
       res.send("code ok!")
     },
     function(err) {
